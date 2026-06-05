@@ -7,13 +7,50 @@ export default function Contact() {
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    // In production, connect to a backend or EmailJS
-    setSent(true)
-    setTimeout(() => setSent(false), 4000)
-    setForm({ name: '', email: '', phone: '', message: '' })
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const formData = {
+    access_key: "f48ea37e-f38b-4ba4-acf4-314376e1a66f",
+    name: form.name,
+    email: form.email,
+    phone: form.phone,
+    message: form.message,
+  };
+
+  try {
+    const response = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      setSent(true);
+
+      setForm({
+        name: "",
+        email: "",
+        phone: "",
+        message: "",
+      });
+
+      setTimeout(() => {
+        setSent(false);
+      }, 4000);
+    } else {
+      alert("Failed to send message");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Something went wrong");
   }
+};
 
   return (
     <section id="contact" className="section contact">
@@ -72,6 +109,11 @@ export default function Contact() {
           {/* Form */}
           <div className="contact-form-wrap">
             <form className="contact-form" onSubmit={handleSubmit}>
+               <input
+    type="hidden"
+    name="access_key"
+    value="f48ea37e-f38b-4ba4-acf4-314376e1a66f"
+  />
               <div className="form-row">
                 <div className="form-group">
                   <label className="form-label">Name</label>
